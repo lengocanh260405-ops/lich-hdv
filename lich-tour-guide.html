@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lịch Hướng Dẫn Viên</title>
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lịch HDV">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--pri:#3b82f6;--pri-d:#2563eb;--pri-s:#e8f1fd;--tx:#1e293b;--mut:#64748b;--bd:#e2e8f0;--red:#dc2626;--green:#16a34a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);font-size:15px;min-height:100vh}
+h1{font-size:22px;margin:0}
+h3{margin:0 0 10px;font-size:16px}
+.mut{color:var(--mut);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.between{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.nowrap{white-space:nowrap}
+/* sidebar */
+.side{position:fixed;left:0;top:0;bottom:0;width:220px;background:#fff;border-right:1px solid var(--bd);padding:18px 12px;display:flex;flex-direction:column;gap:6px;z-index:20}
+.brand{font-weight:700;color:var(--pri-d);padding:6px 10px 16px;font-size:17px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{background:none;border:0;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--tx);font:inherit;display:flex;gap:10px;align-items:center;text-align:left}
+.nav button.on,.nav button:hover{background:var(--pri-s);color:var(--pri-d)}
+.nav .ic{font-size:17px;width:22px;text-align:center}
+main{margin-left:220px;padding:20px 24px 40px;max-width:1200px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.topR{position:relative;display:flex;gap:8px}
+/* buttons & inputs */
+.btn{background:var(--pri);color:#fff;border:1px solid transparent;border-radius:8px;padding:8px 14px;cursor:pointer;font:inherit;white-space:nowrap}
+.btn:hover{filter:brightness(.96)}
+.btn.ghost{background:#fff;color:var(--tx);border-color:var(--bd)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn.ok{background:var(--green)}
+.btn.danger{background:#fff;color:var(--red);border-color:#fecaca}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:#fff;width:100%;color:var(--tx)}
+input[type=checkbox]{width:auto}
+.seg{display:inline-flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{background:none;border:0;padding:7px 12px;cursor:pointer;font:inherit;color:var(--mut)}
+.seg button.on{background:var(--pri-s);color:var(--pri-d);font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.stat .v{font-size:20px;font-weight:700;margin-top:4px}
+.stat .l{color:var(--mut);font-size:13px}
+.section{margin-top:14px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#eef2f7;color:var(--mut);white-space:nowrap}
+.b-todo{background:#e0f2fe;color:#075985}.b-doing{background:#fef3c7;color:#92400e}.b-done{background:#dcfce7;color:#166534}.b-cancel{background:#f1f5f9;color:#64748b;text-decoration:line-through}
+.b-unpaid{background:#fee2e2;color:#991b1b}.b-partial{background:#fef3c7;color:#92400e}.b-full{background:#dcfce7;color:#166534}
+/* timeline */
+.hscroll{overflow-x:auto}
+.hrow{display:flex;border-bottom:1px solid var(--bd);min-height:50px}
+.hlab{width:64px;flex:none;font-size:13px;color:var(--mut);padding:8px 0}
+.hcont{flex:1;padding:6px 0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ev{display:flex;justify-content:space-between;gap:8px;background:#fff;border:1px solid var(--bd);border-left:4px solid var(--c);border-radius:8px;padding:8px 10px}
+.ev.cancel{opacity:.5}
+.ev .t{font-weight:600}
+.ev .m{font-size:13px;color:var(--mut)}
+.ev .acts{display:flex;flex-direction:column;gap:4px;flex:none}
+.slot{color:#94a3b8;font-size:13px;padding:6px;border:1px dashed var(--bd);border-radius:8px;cursor:pointer;text-align:center}
+.slot:hover{background:var(--pri-s)}
+.grp{font-size:13px;color:var(--mut);margin:6px 0}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:8px;min-width:920px}
+.wcol{background:#f8fafc;border-radius:10px;padding:8px;min-height:220px;display:flex;flex-direction:column;gap:6px}
+.wcol.today{outline:2px solid var(--pri)}
+.whead{background:none;border:0;text-align:left;cursor:pointer;font:inherit;padding:0 0 4px;color:var(--tx)}
+.chipev{background:#fff;border-left:3px solid var(--c);border-radius:6px;padding:4px 6px;font-size:13px;cursor:pointer;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.mhead,.mg{display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));gap:4px;min-width:700px}
+.mhead{font-size:12px;color:var(--mut);text-align:center;margin-bottom:4px}
+.mc{background:#fff;border:1px solid var(--bd);border-radius:8px;min-height:96px;padding:4px;cursor:pointer;font-size:12px;overflow:hidden}
+.mc.other{opacity:.45}
+.mc.today{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri)}
+.mn{font-weight:600;margin-bottom:2px}
+.chip{display:block;border-radius:4px;padding:1px 4px;margin-top:2px;color:#fff;background:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+/* tour cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.tcard .tt{font-size:16px}
+.tcard .m{font-size:13px;color:var(--mut);margin-top:4px}
+.tcard.cancel{opacity:.6}
+.tcard .acts{margin-top:10px}
+.rem{padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:600;background:#f8fafc;white-space:nowrap}
+.pop{position:absolute;top:44px;right:0;background:#fff;border:1px solid var(--bd);border-radius:12px;box-shadow:0 10px 30px rgba(15,23,42,.12);padding:10px;width:300px;max-height:70vh;overflow:auto;z-index:40}
+#qmenu{width:200px}
+#qmenu button{display:block;width:100%;text-align:left;background:none;border:0;padding:9px;border-radius:8px;cursor:pointer;font:inherit}
+#qmenu button:hover{background:var(--pri-s)}
+.cnt{background:#dc2626;color:#fff;border-radius:999px;padding:0 6px;font-size:12px;margin-left:4px}
+/* dialog */
+dialog{border:0;border-radius:14px;padding:0;width:min(600px,94vw);max-height:90vh;color:var(--tx);background:#fff;box-shadow:0 20px 50px rgba(15,23,42,.25)}
+dialog::backdrop{background:rgba(15,23,42,.35)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bd);font-weight:600}
+.x{background:none;border:0;font-size:18px;cursor:pointer;color:var(--mut)}
+.mb{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:65vh;overflow:auto}
+.df{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mut)}
+.full{grid-column:1/-1}
+.ck{display:flex;flex-direction:row;align-items:center;gap:8px;color:var(--tx);font-size:14px}
+.pay-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.sum{display:flex;gap:14px;flex-wrap:wrap;background:var(--pri-s);padding:10px;border-radius:8px}
+#toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:24px;background:#1e293b;color:#fff;padding:10px 14px;border-radius:10px;display:flex;gap:10px;align-items:center;opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:92vw}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast.err{background:#b91c1c}
+.view{}
+@media(max-width:768px){
+  .side{top:auto;bottom:0;right:0;width:auto;height:64px;flex-direction:row;border-right:0;border-top:1px solid var(--bd);padding:4px 2px;justify-content:center}
+  .brand{display:none}
+  .nav{flex-direction:row;width:100%;justify-content:space-around}
+  .nav button{flex-direction:column;gap:1px;font-size:10px;padding:6px 1px;text-align:center;flex:1;justify-content:center;min-width:0}
+  .nav .ic{font-size:18px;width:auto}
+  .nav .lb{line-height:1.1}
+  main{margin-left:0;padding:14px 14px 96px}
+  .grid2{grid-template-columns:1fr}
+  .grid4{grid-template-columns:1fr 1fr;gap:8px}
+  .grid4 .card{padding:12px}
+  .grid4 .stat .v{font-size:17px}
+  .filters{grid-template-columns:1fr 1fr}
+  .mb{grid-template-columns:1fr}
+  .ev{flex-direction:column}
+  .ev .acts{flex-direction:row}
+  #toast{bottom:84px}
+  .pop{width:270px}
+}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand">🧭 Lịch Hướng Dẫn Viên</div>
+  <nav class="nav">
+    <button data-v="dashboard"><span class="ic">🏠</span><span class="lb">Tổng quan</span></button>
+    <button data-v="schedule"><span class="ic">🗓️</span><span class="lb">Lịch làm việc</span></button>
+    <button data-v="tours"><span class="ic">🧭</span><span class="lb">Quản lý tour</span></button>
+    <button data-v="personal"><span class="ic">🏃</span><span class="lb">Lịch cá nhân</span></button>
+    <button data-v="income"><span class="ic">💰</span><span class="lb">Thu nhập</span></button>
+    <button data-v="stats"><span class="ic">📊</span><span class="lb">Thống kê</span></button>
+    <button data-v="settings"><span class="ic">⚙️</span><span class="lb">Cài đặt</span></button>
+  </nav>
+</aside>
+
+<main>
+  <header class="top">
+    <div class="mut" id="hdrDate"></div>
+    <div class="topR">
+      <button class="btn ghost" id="bell">🔔<span class="cnt" id="bellN" hidden>0</span></button>
+      <button class="btn" id="quick">+ Thêm nhanh</button>
+      <div class="pop" id="notif" hidden></div>
+      <div class="pop" id="qmenu" hidden>
+        <button data-q="work">📅 Lịch làm việc</button>
+        <button data-q="tour">🧭 Tour mới</button>
+        <button data-q="personal">🏃 Lịch cá nhân</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TỔNG QUAN -->
+  <section class="view" id="v-dashboard">
+    <div class="top"><div><h1>Tổng quan</h1><div class="mut" id="dToday"></div></div></div>
+    <div class="grid4" id="dStats"></div>
+    <div class="grid2">
+      <div class="card"><h3>Lịch hôm nay</h3><div id="dToday2"></div></div>
+      <div class="card"><h3>Nhắc nhở</h3><div id="dRem"></div></div>
+    </div>
+    <div class="card section"><h3>Công việc & tour sắp tới</h3><div id="dUp"></div></div>
+  </section>
+
+  <!-- LỊCH LÀM VIỆC -->
+  <section class="view" id="v-schedule" hidden>
+    <div class="top"><h1>Lịch làm việc</h1>
+      <div class="row">
+        <button class="btn" id="addEv">+ Thêm lịch</button>
+        <button class="btn ghost" id="expEv">⬇ Xuất Excel (tháng)</button>
+      </div>
+    </div>
+    <div class="row between" style="margin-bottom:12px">
+      <div class="row">
+        <button class="btn ghost sm" id="prevB">◀</button>
+        <button class="btn ghost sm" id="todayB">Hôm nay</button>
+        <button class="btn ghost sm" id="nextB">▶</button>
+        <b id="rangeLbl"></b>
+      </div>
+      <div class="seg">
+        <button data-m="day">Ngày</button><button data-m="week">Tuần</button><button data-m="month">Tháng</button>
+      </div>
+    </div>
+    <div class="card" style="padding:10px" id="schBody"></div>
+  </section>
+
+  <!-- QUẢN LÝ TOUR -->
+  <section class="view" id="v-tours" hidden>
+    <div class="top"><h1>Quản lý tour</h1><button class="btn" id="newTour">+ Tour mới</button></div>
+    <div class="filters">
+      <input id="fQ" placeholder="Tìm theo tên tour hoặc địa điểm..." oninput="renderTours()">
+      <input type="month" id="fMonth" title="Lọc theo tháng" oninput="renderTours()">
+      <input type="date" id="fDate" title="Lọc theo ngày" oninput="renderTours()">
+      <select id="fStatus" onchange="renderTours()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="todo">Chưa thực hiện</option>
+        <option value="doing">Đang thực hiện</option>
+        <option value="done">Đã hoàn thành</option>
+        <option value="cancel">Đã hủy</option>
+      </select>
+    </div>
+    <div class="mut" id="tourCount" style="margin-bottom:10px"></div>
+    <div class="cards" id="tourBody"></div>
+  </section>
+
+  <!-- LỊCH CÁ NHÂN -->
+  <section class="view" id="v-personal" hidden>
+    <div class="top"><h1>Lịch cá nhân</h1><button class="btn" id="newPersonal">+ Thêm lịch cá nhân</button></div>
+    <div class="filters" style="grid-template-columns:1fr 2fr">
+      <input type="month" id="pMonth" oninput="renderPersonal()">
+      <select id="pSub" onchange="renderPersonal()"><option value="">Tất cả hoạt động</option></select>
+    </div>
+    <div class="card" id="pBody"></div>
+  </section>
+
+  <!-- THU NHẬP -->
+  <section class="view" id="v-income" hidden>
+    <div class="top"><h1>Thu nhập</h1><button class="btn ghost" id="expInc">⬇ Xuất Excel thu nhập</button></div>
+    <div class="grid4" id="iStats"></div>
+    <div class="card section">
+      <div class="between" style="margin-bottom:8px"><h3 style="margin:0">Thu nhập theo tháng (tour đã hoàn thành)</h3>
+        <select id="iYear" style="width:auto" onchange="renderIncome()"></select></div>
+      <div id="iChart"></div>
+    </div>
+    <div class="card section">
+      <div class="between" style="margin-bottom:10px"><h3 style="margin:0">Chi tiết tiền công từng tour</h3>
+        <select id="iPay" style="width:auto" onchange="renderIncome()">
+          <option value="">Tất cả thanh toán</option>
+          <option value="unpaid">Chưa thanh toán</option>
+          <option value="partial">Thanh toán một phần</option>
+          <option value="full">Thanh toán đầy đủ</option>
+        </select></div>
+      <div class="hscroll" id="iTable"></div>
+    </div>
+  </section>
+
+  <!-- THỐNG KÊ -->
+  <section class="view" id="v-stats" hidden>
+    <div class="top"><h1>Thống kê</h1><select id="sYear" style="width:auto" onchange="renderStats()"></select></div>
+    <div id="sBody"></div>
+  </section>
+
+  <!-- CÀI ĐẶT -->
+  <section class="view" id="v-settings" hidden>
+    <div class="top"><h1>Cài đặt</h1></div>
+    <div class="card">
+      <h3>Nhắc trước giờ bắt đầu</h3>
+      <div class="row">
+        <select id="setLead" style="width:auto" onchange="setLead(this.value)">
+          <option value="15">15 phút</option><option value="30">30 phút</option><option value="60">1 giờ</option>
+        </select>
+        <button class="btn ghost" onclick="askNotify()">Bật thông báo trình duyệt</button>
+      </div>
+      <p class="mut" id="notifState"></p>
+      <p class="mut">Nhắc nhở hoạt động khi trang web đang mở trên trình duyệt.</p>
+    </div>
+    <div class="card section">
+      <h3>Sao lưu & dữ liệu</h3>
+      <p class="mut">Dữ liệu được lưu trong trình duyệt này. Nếu xóa dữ liệu trình duyệt hoặc đổi máy, hãy sao lưu trước.</p>
+      <div class="row">
+        <button class="btn" onclick="exportBackup()">⬇ Sao lưu (JSON)</button>
+        <label class="btn ghost" style="cursor:pointer">⬆ Khôi phục từ file JSON<input type="file" accept="application/json" hidden id="impFile"></label>
+        <button class="btn ghost" onclick="exportSchedule()">⬇ Xuất lịch tháng (Excel/CSV)</button>
+        <button class="btn ghost" onclick="exportIncome()">⬇ Xuất thu nhập (Excel/CSV)</button>
+      </div>
+      <p class="mut">File CSV mở trực tiếp bằng Excel. Ngày hiển thị theo định dạng DD/MM/YYYY, múi giờ Việt Nam (GMT+7).</p>
+    </div>
+    <div class="card section">
+      <h3>Xóa toàn bộ dữ liệu</h3>
+      <button class="btn danger" onclick="clearAll()">Xóa toàn bộ dữ liệu</button>
+    </div>
+  </section>
+</main>
+
+<!-- Hộp thoại dùng chung -->
+<dialog id="dlg">
+  <form id="dlgForm" method="dialog">
+    <div class="dh"><span id="dlgTitle"></span><button type="button" class="x" onclick="closeDlg()">✕</button></div>
+    <div class="mb" id="dlgBody"></div>
+    <div class="df">
+      <span class="row" id="dlgExtra"></span>
+      <span class="row">
+        <button type="button" class="btn ghost" onclick="closeDlg()">Hủy</button>
+        <button type="submit" class="btn" id="dlgSave">Lưu</button>
+      </span>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+/* ================= HẰNG SỐ ================= */
+const KEY='lich_huong_dan_vien_v1';
+const TZ='Asia/Ho_Chi_Minh';
+const CATS={tour:['Tour du lịch','#2563eb'],self:['Công việc cá nhân','#0ea5e9'],meeting:['Họp & trao đổi công ty','#f59e0b'],travel:['Di chuyển','#6b7280'],rest:['Nghỉ ngơi','#22c55e'],other:['Công việc khác','#94a3b8'],personal:['Lịch cá nhân','#10b981']};
+const PERSONAL_SUBS=['Tập thể dục','Học ngoại ngữ','Hẹn cá nhân','Khám bệnh','Nghỉ ngơi','Khác'];
+const TOUR_STATUS={todo:'Chưa thực hiện',doing:'Đang thực hiện',done:'Đã hoàn thành',cancel:'Đã hủy'};
+const TOUR_BADGE={todo:'b-todo',doing:'b-doing',done:'b-done',cancel:'b-cancel'};
+const PAY_LABEL={unpaid:'Chưa thanh toán',partial:'Đã thanh toán một phần',full:'Đã thanh toán đầy đủ'};
+const PAY_CLS={unpaid:'b-unpaid',partial:'b-partial',full:'b-full'};
+const CHECK_ITEMS=['Đã đón và trả khách đầy đủ','Đã hoàn thành lịch trình','Đã bàn giao hoặc thanh toán các khoản cần thiết','Đã ghi chú các vấn đề phát sinh'];
+const DOW=['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
+const DOWS=['CN','T2','T3','T4','T5','T6','T7'];
+
+/* ================= LƯU TRỮ ================= */
+function loadDB(){
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(d&&Array.isArray(d.tours)&&Array.isArray(d.events)){
+      return {tours:d.tours,events:d.events,settings:Object.assign({lead:30},d.settings||{})};
+    }
+  }catch(e){console.warn('Không đọc được dữ liệu',e);}
+  return {tours:[],events:[],settings:{lead:30}};
+}
+let db=loadDB();
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(db));return true;}
+  catch(e){toast('Không lưu được dữ liệu: '+e.message,true);return false;}
+}
+function commit(){save();renderCurrent();return null;}
+
+/* ================= TIỆN ÍCH ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0;};
+const pad=n=>String(n).padStart(2,'0');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const money=n=>Math.round(num(n)).toLocaleString('vi-VN')+' ₫';
+const toMin=s=>{const [h,m]=String(s).split(':').map(Number);return h*60+m;};
+const hhmm=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+const addMinStr=(s,k)=>hhmm(Math.min(1439,toMin(s)+k));
+
+function vnNow(){
+  const p={};
+  new Intl.DateTimeFormat('en-GB',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'})
+    .formatToParts(new Date()).forEach(x=>p[x.type]=x.value);
+  return {date:`${p.year}-${p.month}-${p.day}`,min:(+p.hour)*60+(+p.minute)};
+}
+const todayStr=()=>vnNow().date;
+// Thời điểm (ms) theo giờ Việt Nam GMT+7
+function tsOf(date,time){const [y,m,d]=date.split('-').map(Number);const [h,i]=(time||'00:00').split(':').map(Number);return Date.UTC(y,m-1,d,h,i)-7*3600000;}
+function addDays(s,n){const [y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10);}
+function dow(s){const [y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).getUTCDay();}
+function weekStart(s){return addDays(s,-((dow(s)+6)%7));}
+const fd=s=>{if(!s)return '';const [y,m,d]=s.split('-');return `${d}/${m}/${y}`;};
+const monthKey=s=>String(s).slice(0,7);
+function fmtDT(iso){
+  const p={};
+  new Intl.DateTimeFormat('en-GB',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'})
+    .formatToParts(new Date(iso)).forEach(x=>p[x.type]=x.value);
+  return `${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}`;
+}
+
+/* ================= TÍNH TOÁN TOUR & THU NHẬP ================= */
+// Tổng tiền thực nhận = Tiền công + Phụ cấp + Thưởng - Khoản khấu trừ
+const tourTotal=t=>Math.max(0,num(t.fee)+num(t.allowance)+num(t.bonus)-num(t.deduction));
+const tourPaid=t=>(t.payments||[]).reduce((s,p)=>s+num(p.amount),0);
+const tourOwed=t=>Math.max(0,tourTotal(t)-tourPaid(t));
+function payStatus(t){const paid=tourPaid(t),tot=tourTotal(t);if(paid<=0)return 'unpaid';if(paid<tot)return 'partial';return 'full';}
+const isDone=t=>t.status==='done';
+const isActive=t=>t.status!=='cancel';
+const tourById=id=>db.tours.find(t=>t.id===id);
+const statusBadge=s=>`<span class="badge ${TOUR_BADGE[s]||''}">${TOUR_STATUS[s]||s}</span>`;
+
+// Đồng bộ: mỗi tour có một lịch tương ứng trên lịch làm việc
+function syncTour(t){
+  let e=db.events.find(x=>x.tourId===t.id);
+  if(!e){e={id:uid(),category:'tour',tourId:t.id};db.events.push(e);}
+  Object.assign(e,{title:t.name,date:t.date,start:t.start,end:t.end,location:t.pickup||'',note:''});
+}
+function syncAll(){
+  db.events=db.events.filter(e=>!e.tourId||tourById(e.tourId));
+  db.tours.forEach(syncTour);
+}
+function removeTourEvents(id){db.events=db.events.filter(e=>e.tourId!==id);}
+
+function completeTour(id){
+  const t=tourById(id);if(!t)return;
+  const prev={status:t.status,completedAt:t.completedAt||null};
+  t.status='done';t.completedAt=new Date().toISOString();
+  commit();
+  toast(`Đã hoàn thành: ${t.name} (+${money(tourTotal(t))})`,false,()=>{t.status=prev.status;t.completedAt=prev.completedAt;commit();});
+}
+
+function evColor(e){return (CATS[e.category]||CATS.other)[1];}
+function evLabel(e){return e.category==='personal'?(e.sub||'Lịch cá nhân'):(CATS[e.category]||CATS.other)[0];}
+function evsOn(d){return db.events.filter(e=>e.date===d).sort((a,b)=>a.start.localeCompare(b.start));}
+function excluded(e){const t=e.tourId&&tourById(e.tourId);return !!(t&&!isActive(t));}
+
+/* ================= THÔNG BÁO / DIALOG / TOAST ================= */
+let tTimer;
+function toast(msg,err,undo){
+  const el=$('#toast');
+  el.innerHTML=`<span>${esc(msg)}</span>`+(undo?'<button class="btn sm ghost" id="undoBtn">Hoàn tác</button>':'');
+  el.className='show'+(err?' err':'');
+  if(undo)$('#undoBtn').onclick=()=>{undo();el.className='';};
+  clearTimeout(tTimer);
+  tTimer=setTimeout(()=>el.className='',undo?6000:3500);
+}
+const dlg=$('#dlg');
+function openForm(title,body,onSave,opts={}){
+  $('#dlgTitle').textContent=title;
+  $('#dlgBody').innerHTML=body;
+  $('#dlgSave').textContent=opts.saveLabel||'Lưu';
+  const extra=$('#dlgExtra');extra.innerHTML='';
+  (opts.extra||[]).forEach(b=>{
+    const el=document.createElement('button');
+    el.type='button';el.className='btn '+(b.cls||'ghost');el.textContent=b.label;
+    el.onclick=()=>b.onClick(closeDlg);
+    extra.appendChild(el);
+  });
+  $('#dlgForm').onsubmit=ev=>{
+    ev.preventDefault();
+    const err=onSave(new FormData($('#dlgForm')));
+    if(err){toast(err,true);return;}
+    closeDlg();
+  };
+  if(dlg.open)dlg.close();
+  dlg.showModal();
+  const first=$('#dlgBody input,#dlgBody select,#dlgBody textarea');
+  if(first)first.focus();
+}
+function closeDlg(){if(dlg.open)dlg.close();}
+
+function hideAllPops(){document.querySelectorAll('.pop').forEach(p=>p.hidden=true);}
+function togglePop(sel){const el=$(sel);const open=el.hidden;hideAllPops();el.hidden=!open;}
+
+/* Nhắc nhở */
+function reminderItems(){
+  const n=vnNow(),lead=num(db.settings.lead)||30,out=[];
+  db.events.filter(e=>e.date===n.date&&!excluded(e)).forEach(e=>{
+    const diff=tsOf(e.date,e.start)-Date.now();
+    if(diff>0&&diff<=lead*60000)
+      out.push({key:e.id+e.date+e.start,msg:`${e.start} – ${e.title}`,html:`⏰ Còn ${Math.ceil(diff/60000)} phút: <b>${e.start}</b> ${esc(e.title)}`});
+  });
+  db.tours.filter(t=>(t.status==='todo'||t.status==='doing')&&t.date<n.date).forEach(t=>
+    out.push({html:`⚠️ Tour quá ngày chưa xác nhận hoàn thành: <b>${esc(t.name)}</b> (${fd(t.date)})`}));
+  db.tours.filter(t=>isDone(t)&&tourOwed(t)>0).forEach(t=>
+    out.push({html:`💰 Chưa thanh toán: <b>${esc(t.name)}</b> còn ${money(tourOwed(t))}`}));
+  return out;
+}
+let notifiedKeys=new Set();
+try{notifiedKeys=new Set(JSON.parse(sessionStorage.getItem('notifiedKeys')||'[]'));}catch(e){}
+function alertUser(msg){
+  toast(msg);
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Lịch làm việc',{body:msg});}catch(e){}
+}
+function checkReminders(){
+  reminderItems().forEach(r=>{
+    if(r.key&&!notifiedKeys.has(r.key)){
+      notifiedKeys.add(r.key);
+      try{sessionStorage.setItem('notifiedKeys',JSON.stringify([...notifiedKeys]));}catch(e){}
+      alertUser('Sắp đến: '+r.msg);
+    }
+  });
+  renderBell();
+}
+function renderBell(){
+  const items=reminderItems();
+  $('#bellN').textContent=items.length;
+  $('#bellN').hidden=!items.length;
+  $('#notif').innerHTML='<b>Nhắc nhở</b>'+(items.length?items.map(i=>`<div class="rem">${i.html}</div>`).join(''):'<div class="mut" style="margin-top:6px">Không có nhắc nhở.</div>');
+}
+function askNotify(){
+  if(!('Notification' in window)){toast('Trình duyệt không hỗ trợ thông báo',true);return;}
+  Notification.requestPermission().then(p=>{renderSettings();toast('Quyền thông báo: '+p);});
+}
+
+/* ================= FORM: SỰ KIỆN LỊCH ================= */
+let cur=todayStr(),mode='day';
+function openEventForm(e,pre={}){
+  const v=Object.assign({category:'self',sub:'',title:'',date:cur,start:'08:00',end:'09:00',location:'',note:''},e||{},pre);
+  const cats=Object.keys(CATS).filter(k=>k!=='tour');
+  const body=`
+    <label class="f full">Tên công việc<input name="title" required value="${esc(v.title)}" placeholder="VD: Đón khách tại khách sạn"></label>
+    <label class="f">Loại công việc<select name="category" onchange="$('#subW').hidden=this.value!=='personal'">
+      ${cats.map(k=>`<option value="${k}" ${v.category===k?'selected':''}>${CATS[k][0]}</option>`).join('')}</select></label>
+    <label class="f" id="subW" ${v.category==='personal'?'':'hidden'}>Hoạt động cá nhân<select name="sub">
+      ${PERSONAL_SUBS.map(s=>`<option ${v.sub===s?'selected':''}>${s}</option>`).join('')}</select></label>
+    <label class="f">Ngày<input type="date" name="date" required value="${v.date}"></label>
+    <div></div>
+    <label class="f">Giờ bắt đầu<input type="time" name="start" required value="${v.start}"></label>
+    <label class="f">Giờ kết thúc<input type="time" name="end" required value="${v.end}"></label>
+    <label class="f full">Địa điểm<input name="location" value="${esc(v.location)}"></label>
+    <label class="f full">Ghi chú<textarea name="note" rows="2">${esc(v.note)}</textarea></label>`;
+  const extra=(e&&e.id)?[{label:'Xóa',cls:'danger',onClick:close=>{
+    if(!confirm(`Xóa công việc "${e.title}"?`))return;
+    db.events=db.events.filter(x=>x.id!==e.id);close();commit();
+  }}]:[];
+  openForm(e&&e.id?'Sửa lịch làm việc':'Thêm lịch làm việc',body,f=>{
+    const title=f.get('title').trim();
+    if(!title)return 'Nhập tên công việc';
+    const date=f.get('date'),start=f.get('start'),end=f.get('end');
+    if(!date||!start||!end)return 'Nhập đủ ngày và giờ';
+    if(end<=start)return 'Giờ kết thúc phải sau giờ bắt đầu';
+    const category=f.get('category');
+    const obj={title,category,sub:category==='personal'?f.get('sub'):'',date,start,end,location:f.get('location').trim(),note:f.get('note').trim()};
+    if(e&&e.id)Object.assign(e,obj);else db.events.push(Object.assign({id:uid()},obj));
+    return commit();
+  },{extra});
+}
+function openEvent(id){
+  const e=db.events.find(x=>x.id===id);if(!e)return;
+  if(e.tourId)return openTour(e.tourId);
+  openEventForm(e);
+}
+function shiftEvent(id,d){
+  const e=db.events.find(x=>x.id===id);if(!e)return;
+  const sh=s=>{const m=toMin(s)+d;return (m<0||m>1439)?null:hhmm(m);};
+  const s=sh(e.start),en=sh(e.end);
+  if(!s||!en)return toast('Không dời được sang ngày khác',true);
+  const t=e.tourId&&tourById(e.tourId);
+  if(t){t.start=s;t.end=en;syncTour(t);}
+  else{e.start=s;e.end=en;}
+  commit();
+}
+function quickAt(d,t){openEventForm(null,{date:d,start:t,end:addMinStr(t,60)});}
+
+/* ================= FORM: TOUR ================= */
+function openTour(id,pre={}){
+  const t=id?tourById(id):null;
+  const v=Object.assign({name:'',date:todayStr(),start:'07:00',end:'17:00',company:'',guests:'',pickup:'',route:'',phone:'',note:'',status:'todo',fee:'',allowance:'',bonus:'',deduction:'',checklist:[]},t||{},pre);
+  const ck=v.checklist||[];
+  const opts=Object.entries(TOUR_STATUS).map(([k,l])=>`<option value="${k}" ${v.status===k?'selected':''}>${l}</option>`).join('');
+  const money_=(name,label)=>`<label class="f">${label}<input type="number" min="0" step="any" name="${name}" value="${v[name]===''||v[name]==null?'':v[name]}"></label>`;
+  const body=`
+    <label class="f full">Tên tour<input name="name" required value="${esc(v.name)}"></label>
+    <label class="f">Ngày thực hiện<input type="date" name="date" required value="${v.date}"></label>
+    <label class="f">Trạng thái<select name="status">${opts}</select></label>
+    <label class="f">Giờ bắt đầu<input type="time" name="start" required value="${v.start}"></label>
+    <label class="f">Giờ kết thúc<input type="time" name="end" required value="${v.end}"></label>
+    <label class="f">Tên công ty / đơn vị thuê<input name="company" value="${esc(v.company)}"></label>
+    <label class="f">Số lượng khách<input type="number" min="0" name="guests" value="${esc(v.guests)}"></label>
+    <label class="f">Địa điểm đón khách<input name="pickup" value="${esc(v.pickup)}"></label>
+    <label class="f">Số điện thoại liên hệ<input name="phone" value="${esc(v.phone)}"></label>
+    <label class="f full">Lịch trình tour<textarea name="route" rows="3">${esc(v.route)}</textarea></label>
+    <label class="f full">Ghi chú riêng<textarea name="note" rows="2">${esc(v.note)}</textarea></label>
+    <div class="full"><b>Tiền công</b> ${t&&t.completedAt?`<span class="mut">· Hoàn thành lúc ${fmtDT(t.completedAt)}</span>`:''}</div>
+    ${money_('fee','Tiền công dự kiến (₫)')}
+    ${money_('allowance','Tiền phụ cấp (₫)')}
+    ${money_('bonus','Tiền thưởng (₫)')}
+    ${money_('deduction','Khoản khấu trừ (₫)')}
+    <div class="full"><b>Checklist trước khi xác nhận hoàn thành</b> <span class="mut">(tùy chọn)</span></div>
+    ${CHECK_ITEMS.map((x,i)=>`<label class="ck full"><input type="checkbox" name="ck${i}" ${ck[i]?'checked':''}>${x}</label>`).join('')}`;
+  const extra=[];
+  if(t){
+    if(!isDone(t)&&isActive(t))extra.push({label:'✓ Hoàn thành tour',cls:'ok',onClick:close=>{completeTour(t.id);close();}});
+    extra.push({label:'Xóa',cls:'danger',onClick:close=>{
+      if(!confirm(`Xóa tour "${t.name}"? Lịch tour tương ứng cũng sẽ bị xóa.`))return;
+      db.tours=db.tours.filter(x=>x.id!==t.id);removeTourEvents(t.id);close();commit();
+    }});
+  }
+  openForm(t?'Chi tiết / sửa tour':'Tour mới',body,f=>{
+    const name=f.get('name').trim();
+    if(!name)return 'Nhập tên tour';
+    const date=f.get('date'),start=f.get('start'),end=f.get('end');
+    if(!date)return 'Chọn ngày thực hiện';
+    if(!start||!end||end<=start)return 'Giờ kết thúc phải sau giờ bắt đầu';
+    const status=f.get('status');
+    const obj={name,date,start,end,
+      company:f.get('company').trim(),guests:f.get('guests')||'',pickup:f.get('pickup').trim(),
+      phone:f.get('phone').trim(),route:f.get('route').trim(),note:f.get('note').trim(),status,
+      fee:num(f.get('fee')),allowance:num(f.get('allowance')),bonus:num(f.get('bonus')),deduction:num(f.get('deduction')),
+      checklist:[0,1,2,3].map(i=>f.has('ck'+i))};
+    if(t){
+      const wasDone=isDone(t);
+      Object.assign(t,obj);
+      if(status==='done'){if(!wasDone||!t.completedAt)t.completedAt=new Date().toISOString();}
+      else t.completedAt=null;
+      syncTour(t);
+    }else{
+      const nt=Object.assign({id:uid(),payments:[],completedAt:status==='done'?new Date().toISOString():null},obj);
+      db.tours.push(nt);syncTour(nt);
+    }
+    return commit();
+  },{extra});
+}
+
+/* Thanh toán tiền công */
+function openPayment(id){
+  const t=tourById(id);if(!t)return;
+  const owed=tourOwed(t);
+  const list=(t.payments||[]).map(p=>`<div class="pay-row"><span>${fd(p.date)}${p.note?' · '+esc(p.note):''}</span><b>${money(p.amount)}</b><button type="button" class="btn sm danger" onclick="delPayment('${t.id}','${p.id}')">Xóa</button></div>`).join('')
+    ||'<div class="mut">Chưa có khoản thanh toán nào.</div>';
+  const body=`
+    <div class="full sum"><div>Tổng thực nhận: <b>${money(tourTotal(t))}</b></div><div>Đã nhận: <b>${money(tourPaid(t))}</b></div><div>Còn phải nhận: <b>${money(owed)}</b></div></div>
+    <div class="full">${list}</div>
+    <label class="f">Số tiền nhận (₫)<input type="number" min="1" step="any" name="amount" required value="${owed||''}"></label>
+    <label class="f">Ngày nhận tiền<input type="date" name="date" required value="${todayStr()}"></label>
+    <label class="f full">Ghi chú<input name="note"></label>`;
+  openForm(`Thanh toán – ${t.name}`,body,f=>{
+    const amt=num(f.get('amount'));
+    if(amt<=0)return 'Nhập số tiền lớn hơn 0';
+    t.payments=t.payments||[];
+    t.payments.push({id:uid(),amount:amt,date:f.get('date'),note:f.get('note').trim()});
+    return commit();
+  },{saveLabel:'Ghi nhận'});
+}
+function delPayment(tid,pid){
+  const t=tourById(tid);if(!t)return;
+  if(!confirm('Xóa khoản thanh toán này?'))return;
+  t.payments=t.payments.filter(p=>p.id!==pid);
+  commit();openPayment(tid);
+}
+
+/* ================= RENDER: TỔNG QUAN ================= */
+function remHTML(){
+  const items=reminderItems();
+  return items.length?items.map(i=>`<div class="rem">${i.html}</div>`).join(''):'<div class="mut">Không có nhắc nhở.</div>';
+}
+function evCard(e,showDate){
+  const t=e.tourId&&tourById(e.tourId);
+  const cancelled=t&&!isActive(t),done=t&&isDone(t);
+  const color=evColor(e);
+  return `<div class="ev ${cancelled?'cancel':''}" style="--c:${color}">
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="openEvent('${e.id}')">
+      <div class="m">${showDate?fd(e.date)+' · ':''}${e.start} – ${e.end} · <span style="color:${color};font-weight:600">${esc(evLabel(e))}</span>
+        ${done?' · <span class="badge b-done">✓ Đã xong</span>':''}${cancelled?' · <span class="badge b-cancel">Đã hủy</span>':''}</div>
+      <div class="t">${esc(e.title)}</div>
+      ${e.location?`<div class="m">📍 ${esc(e.location)}</div>`:''}
+    </div>
+    <div class="acts">
+      ${t&&!done&&!cancelled?`<button class="btn sm ok" onclick="completeTour('${t.id}')">✓ Xong</button>`:''}
+      <button class="btn sm ghost" title="Dời lùi 30 phút" onclick="shiftEvent('${e.id}',-30)">◀30′</button>
+      <button class="btn sm ghost" title="Dời tới 30 phút" onclick="shiftEvent('${e.id}',30)">30′▶</button>
+    </div>
+  </div>`;
+}
+function renderDashboard(){
+  const n=vnNow(),d=n.date,mk=monthKey(d);
+  $('#hdrDate').textContent=`${DOW[dow(d)]}, ${fd(d)}`;
+  $('#dToday').textContent=`${DOW[dow(d)]}, ${fd(d)} · ${hhmm(n.min)} (giờ Việt Nam)`;
+  const inMonth=db.tours.filter(t=>isActive(t)&&monthKey(t.date)===mk);
+  const doneMonth=inMonth.filter(isDone);
+  const upcoming=db.tours.filter(t=>(t.status==='todo'||t.status==='doing')&&t.date>=d).length;
+  const incomeMonth=doneMonth.reduce((s,t)=>s+tourTotal(t),0);
+  const expectedMonth=inMonth.filter(t=>!isDone(t)).reduce((s,t)=>s+tourTotal(t),0);
+  let receivedMonth=0;
+  db.tours.forEach(t=>(t.payments||[]).forEach(p=>{if(monthKey(p.date)===mk)receivedMonth+=num(p.amount);}));
+  const debt=db.tours.filter(isDone).reduce((s,t)=>s+tourOwed(t),0);
+  const stat=(l,v)=>`<div class="card stat"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  $('#dStats').innerHTML=
+    stat('Tour trong tháng',inMonth.length)+
+    stat('Đã hoàn thành (tháng)',doneMonth.length)+
+    stat('Tour sắp tới',upcoming)+
+    stat('Tiền công tháng (đã HT)',money(incomeMonth))+
+    stat('Dự kiến tháng (chưa HT)',money(expectedMonth))+
+    stat('Đã nhận trong tháng',money(receivedMonth))+
+    stat('Chưa thanh toán (công nợ)',money(debt));
+  const today=evsOn(d);
+  $('#dToday2').innerHTML=today.length?today.map(e=>evCard(e,false)).join(''):'<div class="mut">Hôm nay chưa có lịch. Bấm "+ Thêm nhanh" để thêm.</div>';
+  $('#dRem').innerHTML=remHTML();
+  const nowHM=hhmm(n.min);
+  const up=db.events.filter(e=>!excluded(e)&&(e.date>d||(e.date===d&&e.start>=nowHM)))
+    .sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start)).slice(0,8);
+  $('#dUp').innerHTML=up.length?up.map(e=>evCard(e,true)).join(''):'<div class="mut">Chưa có lịch sắp tới.</div>';
+}
+
+/* ================= RENDER: LỊCH LÀM VIỆC ================= */
+function gotoDay(d){mode='day';cur=d;renderCurrent();}
+function nav(dir){
+  if(mode==='day')cur=addDays(cur,dir);
+  else if(mode==='week')cur=addDays(cur,7*dir);
+  else{const [y,m]=cur.split('-').map(Number);cur=new Date(Date.UTC(y,m-1+dir,1)).toISOString().slice(0,7)+'-01';}
+  renderCurrent();
+}
+function dayHTML(d){
+  const evs=evsOn(d);
+  let out=`<div class="mut" style="margin:6px 0 4px">${evs.length} việc trong ngày</div>`;
+  for(let h=0;h<=23;h++){
+    const hh=pad(h);
+    const items=evs.filter(e=>Math.floor(toMin(e.start)/60)===h);
+    out+=`<div class="hrow"><div class="hlab">${hh}:00</div><div class="hcont">${items.length?items.map(e=>evCard(e,false)).join(''):`<div class="slot" onclick="quickAt('${d}','${hh}:00')">+ Thêm lúc ${hh}:00</div>`}</div></div>`;
+  }
+  return out;
+}
+function weekHTML(ws){
+  let cols='';
+  for(let i=0;i<7;i++){
+    const d=addDays(ws,i),evs=evsOn(d);
+    cols+=`<div class="wcol ${d===todayStr()?'today':''}">
+      <button class="whead" onclick="gotoDay('${d}')"><b>${DOWS[dow(d)]}</b> · ${fd(d).slice(0,5)}</button>
+      ${evs.map(e=>`<div class="chipev" style="--c:${evColor(e)}" onclick="openEvent('${e.id}')">${e.start} ${esc(e.title)}</div>`).join('')}
+      <button class="slot" onclick="quickAt('${d}','08:00')">+</button></div>`;
+  }
+  return `<div class="hscroll"><div class="wk">${cols}</div></div>`;
+}
+function monthHTML(d){
+  const first=d.slice(0,7)+'-01',start=weekStart(first),today=todayStr();
+  let cells='';
+  for(let i=0;i<42;i++){
+    const day=addDays(start,i),evs=evsOn(day),other=monthKey(day)!==monthKey(first);
+    cells+=`<div class="mc ${other?'other':''} ${day===today?'today':''}" onclick="gotoDay('${day}')">
+      <div class="mn">${Number(day.slice(8))}</div>
+      ${evs.slice(0,3).map(e=>`<span class="chip" style="--c:${evColor(e)}" onclick="event.stopPropagation();openEvent('${e.id}')">${e.start} ${esc(e.title)}</span>`).join('')}
+      ${evs.length>3?`<div class="mut">+${evs.length-3} việc</div>`:''}</div>`;
+  }
+  return `<div class="hscroll"><div class="mhead">${DOWS.map(x=>`<div>${x}</div>`).join('')}</div><div class="mg">${cells}</div></div>`;
+}
+function renderSchedule(){
+  document.querySelectorAll('#v-schedule [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  if(mode==='day'){$('#rangeLbl').textContent=`${DOW[dow(cur)]}, ${fd(cur)}`;$('#schBody').innerHTML=dayHTML(cur);}
+  else if(mode==='week'){const ws=weekStart(cur);$('#rangeLbl').textContent=`${fd(ws)} – ${fd(addDays(ws,6))}`;$('#schBody').innerHTML=weekHTML(ws);}
+  else{$('#rangeLbl').textContent=`Tháng ${cur.slice(5,7)}/${cur.slice(0,4)}`;$('#schBody').innerHTML=monthHTML(cur);}
+}
+
+/* ================= RENDER: TOUR ================= */
+function tourCard(t){
+  const st=payStatus(t),c=!isActive(t);
+  return `<div class="card tcard ${c?'cancel':''}">
+    <div class="between"><b class="tt">${esc(t.name)}</b>${statusBadge(t.status)}</div>
+    <div class="m">📅 ${fd(t.date)} · ${t.start} – ${t.end}${t.guests?' · 👥 '+esc(t.guests)+' khách':''}</div>
+    ${t.company?`<div class="m">🏢 ${esc(t.company)}</div>`:''}
+    ${t.pickup?`<div class="m">📍 ${esc(t.pickup)}</div>`:''}
+    ${t.phone?`<div class="m">📞 ${esc(t.phone)}</div>`:''}
+    <div class="between" style="margin-top:8px"><span>Tiền công: <b>${money(tourTotal(t))}</b></span><span class="badge ${PAY_CLS[st]}">${PAY_LABEL[st]}</span></div>
+    ${t.completedAt?`<div class="m">✓ Hoàn thành lúc ${fmtDT(t.completedAt)}</div>`:''}
+    <div class="row acts">
+      ${!isDone(t)&&isActive(t)?`<button class="btn sm ok" onclick="completeTour('${t.id}')">✓ Hoàn thành</button>`:''}
+      <button class="btn sm ghost" onclick="openTour('${t.id}')">Chi tiết / Sửa</button>
+      <button class="btn sm ghost" onclick="openPayment('${t.id}')">Thanh toán</button>
+    </div>
+  </div>`;
+}
+function renderTours(){
+  const q=$('#fQ').value.trim().toLowerCase(),mo=$('#fMonth').value,dt=$('#fDate').value,st=$('#fStatus').value;
+  const list=db.tours.filter(t=>
+      (!q||(t.name+' '+t.pickup+' '+t.route).toLowerCase().includes(q))&&
+      (!mo||monthKey(t.date)===mo)&&(!dt||t.date===dt)&&(!st||t.status===st))
+    .sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  const sum=list.filter(isActive).reduce((s,t)=>s+tourTotal(t),0);
+  $('#tourCount').textContent=`${list.length} tour · tổng tiền công (không tính tour đã hủy): ${money(sum)}`;
+  $('#tourBody').innerHTML=list.length?list.map(tourCard).join(''):'<div class="card mut">Không có tour phù hợp.</div>';
+}
+
+/* ================= RENDER: LỊCH CÁ NHÂN ================= */
+function renderPersonal(){
+  if(!$('#pMonth').value)$('#pMonth').value=monthKey(todayStr());
+  const sel=$('#pSub');
+  if(sel.options.length<=1)sel.innerHTML='<option value="">Tất cả hoạt động</option>'+PERSONAL_SUBS.map(s=>`<option>${s}</option>`).join('');
+  const mo=$('#pMonth').value,sub=sel.value;
+  const list=db.events.filter(e=>e.category==='personal'&&monthKey(e.date)===mo&&(!sub||e.sub===sub))
+    .sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  let html=`<div class="row between" style="margin-bottom:8px"><span class="mut">${list.length} hoạt động cá nhân trong tháng</span></div>`;
+  if(!list.length)html+='<div class="mut">Chưa có lịch cá nhân. Bấm "+ Thêm lịch cá nhân" để thêm.</div>';
+  let lastDate='';
+  list.forEach(e=>{
+    if(e.date!==lastDate){html+=`<div class="grp" style="margin-top:10px"><b>${DOW[dow(e.date)]}, ${fd(e.date)}</b></div>`;lastDate=e.date;}
+    html+=evCard(e,false);
+  });
+  $('#pBody').innerHTML=html;
+}
+
+/* ================= RENDER: THU NHẬP ================= */
+function fillYears(sel,def){
+  const el=$(sel);
+  const ys=new Set([String(vnNow().date.slice(0,4)),def,...db.tours.map(t=>t.date.slice(0,4))]);
+  const cur=el.value||def;
+  el.innerHTML=[...ys].sort().reverse().map(y=>`<option ${y===cur?'selected':''}>${y}</option>`).join('');
+  return el.value;
+}
+function barChart(vals,labels){
+  const W=640,H=230,y0=H-30,max=Math.max(1,...vals),bw=(W-20)/vals.length;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Biểu đồ thu nhập theo tháng">`;
+  s+=`<line x1="10" x2="${W-10}" y1="${y0}" y2="${y0}" stroke="#e2e8f0"/>`;
+  vals.forEach((v,i)=>{
+    const h=(y0-24)*v/max,x=10+i*bw+bw*0.18,y=y0-h;
+    s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.64).toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="#3b82f6"><title>${labels[i]}: ${money(v)}</title></rect>`;
+    s+=`<text x="${(x+bw*0.32).toFixed(1)}" y="${y0+16}" font-size="11" text-anchor="middle" fill="#64748b">${labels[i]}</text>`;
+  });
+  s+=`<text x="10" y="12" font-size="11" fill="#64748b">Cao nhất: ${money(max)}</text></svg>`;
+  return s;
+}
+function renderIncome(){
+  const n=vnNow(),d=n.date,y=fillYears('#iYear',d.slice(0,4));
+  const act=db.tours.filter(isDone);
+  const wk=weekStart(d),wkE=addDays(wk,6),mk=monthKey(d);
+  const sum=pred=>act.filter(pred).reduce((s,t)=>s+tourTotal(t),0);
+  const day=sum(t=>t.date===d),week=sum(t=>t.date>=wk&&t.date<=wkE),month=sum(t=>monthKey(t.date)===mk),year=sum(t=>t.date.startsWith(d.slice(0,4)));
+  const received=db.tours.filter(isActive).reduce((s,t)=>s+tourPaid(t),0);
+  const owed=act.reduce((s,t)=>s+tourOwed(t),0);
+  const expected=db.tours.filter(t=>t.status==='todo'||t.status==='doing').reduce((s,t)=>s+tourTotal(t),0);
+  const stat=(l,v)=>`<div class="card stat"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  $('#iStats').innerHTML=
+    stat('Thu nhập hôm nay',money(day))+stat('Thu nhập tuần này',money(week))+
+    stat('Thu nhập tháng này',money(month))+stat('Thu nhập năm nay',money(year))+
+    stat('Tổng đã nhận',money(received))+stat('Còn phải nhận',money(owed))+
+    stat('Dự kiến (tour chưa HT)',money(expected));
+  const vals=[],labels=[];
+  for(let m=1;m<=12;m++){const k=`${y}-${pad(m)}`;vals.push(sum(t=>t.date.startsWith(k)));labels.push('T'+m);}
+  $('#iChart').innerHTML=barChart(vals,labels);
+  const pf=$('#iPay').value;
+  const rows=db.tours.filter(t=>!pf||payStatus(t)===pf).sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  $('#iTable').innerHTML=rows.length?`<table>
+    <tr><th>Ngày</th><th>Tour</th><th>Tiền công</th><th>Phụ cấp</th><th>Thưởng</th><th>Khấu trừ</th><th>Thực nhận</th><th>Đã nhận</th><th>Thanh toán</th><th>Tình trạng tour</th><th></th></tr>
+    ${rows.map(t=>{const st=payStatus(t);return `<tr>
+      <td class="nowrap">${fd(t.date)}</td>
+      <td><b>${esc(t.name)}</b><div class="mut">${esc(t.company)}</div></td>
+      <td class="nowrap">${money(t.fee)}</td><td class="nowrap">${money(t.allowance)}</td><td class="nowrap">${money(t.bonus)}</td><td class="nowrap">${money(t.deduction)}</td>
+      <td class="nowrap"><b>${money(tourTotal(t))}</b></td><td class="nowrap">${money(tourPaid(t))}</td>
+      <td><span class="badge ${PAY_CLS[st]}">${PAY_LABEL[st]}</span></td>
+      <td>${statusBadge(t.status)}${isDone(t)?`<div class="mut">${fmtDT(t.completedAt)}</div>`:''}</td>
+      <td class="nowrap"><button class="btn sm ghost" onclick="openPayment('${t.id}')">+ Thanh toán</button> <button class="btn sm ghost" onclick="openTour('${t.id}')">Sửa</button></td>
+    </tr>`;}).join('')}
+  </table>`:'<div class="mut">Chưa có tour nào.</div>';
+}
+
+/* ================= RENDER: THỐNG KÊ ================= */
+function renderStats(){
+  const y=fillYears('#sYear',String(vnNow().date.slice(0,4)));
+  let rows='',tI=0,tR=0,tO=0,tC=0;
+  for(let m=1;m<=12;m++){
+    const k=`${y}-${pad(m)}`;
+    const all=db.tours.filter(t=>isActive(t)&&monthKey(t.date)===k),done=all.filter(isDone);
+    const inc=done.reduce((s,t)=>s+tourTotal(t),0),rec=all.reduce((s,t)=>s+tourPaid(t),0),owe=done.reduce((s,t)=>s+tourOwed(t),0);
+    tI+=inc;tR+=rec;tO+=owe;tC+=all.length;
+    rows+=`<tr><td>Tháng ${m}</td><td>${all.length}</td><td>${done.length}</td><td class="nowrap">${money(inc)}</td><td class="nowrap">${money(rec)}</td><td class="nowrap">${money(owe)}</td></tr>`;
+  }
+  const yt=db.tours.filter(t=>t.date.startsWith(y));
+  const statusRows=Object.keys(TOUR_STATUS).map(k=>`<div class="pay-row"><span>${TOUR_STATUS[k]}</span><b>${yt.filter(t=>t.status===k).length}</b></div>`).join('');
+  const comp={};
+  yt.filter(isDone).forEach(t=>{const k=(t.company||'(Chưa ghi tên)').trim();comp[k]=(comp[k]||0)+tourTotal(t);});
+  const top=Object.entries(comp).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const persoN=db.events.filter(e=>e.category==='personal'&&e.date.startsWith(y)).length;
+  $('#sBody').innerHTML=`
+    <div class="grid4">
+      <div class="card stat"><div class="l">Tour trong năm</div><div class="v">${tC}</div></div>
+      <div class="card stat"><div class="l">Thu nhập thực tế (đã HT)</div><div class="v">${money(tI)}</div></div>
+      <div class="card stat"><div class="l">Tổng đã nhận</div><div class="v">${money(tR)}</div></div>
+      <div class="card stat"><div class="l">Còn phải nhận</div><div class="v">${money(tO)}</div></div>
+    </div>
+    <div class="card section"><h3>Chi tiết theo tháng</h3>
+      <div class="hscroll"><table><tr><th>Tháng</th><th>Số tour</th><th>Đã hoàn thành</th><th>Tiền công (đã HT)</th><th>Đã nhận</th><th>Còn phải nhận</th></tr>${rows}
+      <tr><th>Tổng</th><th>${tC}</th><th></th><th>${money(tI)}</th><th>${money(tR)}</th><th>${money(tO)}</th></tr></table></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Tour theo trạng thái (${y})</h3>${statusRows}
+        <div class="pay-row"><span>Lịch cá nhân đã tạo</span><b>${persoN}</b></div></div>
+      <div class="card"><h3>Top đơn vị thuê (đã HT, ${y})</h3>
+        ${top.length?top.map(([k,v])=>`<div class="pay-row"><span>${esc(k)}</span><b>${money(v)}</b></div>`).join(''):'<div class="mut">Chưa có dữ liệu.</div>'}</div>
+    </div>`;
+}
+
+/* ================= XUẤT / SAO LƯU ================= */
+function download(name,rows){
+  const csv='﻿'+rows.map(r=>r.map(c=>{const s=String(c==null?'':c);return /[",;\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+}
+function exportSchedule(){
+  const mk=monthKey(cur);
+  const rows=[['Ngày','Thứ','Bắt đầu','Kết thúc','Loại','Tên công việc','Địa điểm','Ghi chú','Trạng thái tour']];
+  db.events.filter(e=>monthKey(e.date)===mk).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start)).forEach(e=>{
+    const t=e.tourId&&tourById(e.tourId);
+    rows.push([fd(e.date),DOW[dow(e.date)],e.start,e.end,evLabel(e),e.title,e.location||'',e.note||'',t?TOUR_STATUS[t.status]:'']);
+  });
+  download(`lich-lam-viec-${mk}.csv`,rows);
+}
+function exportIncome(){
+  const rows=[['Ngày','Tên tour','Đơn vị thuê','Tiền công','Phụ cấp','Thưởng','Khấu trừ','Thực nhận','Đã nhận','Còn phải nhận','Thanh toán','Trạng thái tour','Hoàn thành lúc']];
+  db.tours.slice().sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start)).forEach(t=>{
+    rows.push([fd(t.date),t.name,t.company,t.fee,t.allowance,t.bonus,t.deduction,tourTotal(t),tourPaid(t),tourOwed(t),PAY_LABEL[payStatus(t)],TOUR_STATUS[t.status],t.completedAt?fmtDT(t.completedAt):'']);
+  });
+  download('thu-nhap-tour.csv',rows);
+}
+function exportBackup(){
+  const url=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
+  const a=document.createElement('a');a.href=url;a.download=`sao-luu-lich-${todayStr()}.json`;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+}
+$('#impFile').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.tours)||!Array.isArray(d.events))throw new Error('File không đúng định dạng sao lưu');
+      if(!confirm('Thay toàn bộ dữ liệu hiện tại bằng dữ liệu trong file sao lưu?'))return;
+      db={tours:d.tours,events:d.events,settings:Object.assign({lead:30},d.settings||{})};
+      syncAll();commit();toast('Đã khôi phục dữ liệu');
+    }catch(err){toast('Lỗi: '+err.message,true);}
+    e.target.value='';
+  };
+  r.readAsText(file);
+});
+function clearAll(){
+  if(!confirm('Xóa TOÀN BỘ tour, lịch và thu nhập? Không thể hoàn tác (hãy sao lưu trước).'))return;
+  db={tours:[],events:[],settings:db.settings};
+  commit();toast('Đã xóa toàn bộ dữ liệu');
+}
+function setLead(v){db.settings.lead=num(v)||30;save();renderBell();toast(`Sẽ nhắc trước ${db.settings.lead} phút`);}
+function renderSettings(){
+  $('#setLead').value=String(db.settings.lead||30);
+  $('#notifState').textContent='Notification' in window?`Quyền thông báo trình duyệt: ${Notification.permission}`:'Trình duyệt này không hỗ trợ thông báo.';
+}
+
+/* ================= ĐIỀU HƯỚNG ================= */
+const VIEWS={dashboard:renderDashboard,schedule:renderSchedule,tours:renderTours,personal:renderPersonal,income:renderIncome,stats:renderStats,settings:renderSettings};
+let view='dashboard';
+function renderCurrent(){
+  VIEWS[view]();
+  renderBell();
+}
+function show(v){
+  view=v;
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='v-'+v);
+  renderCurrent();
+  window.scrollTo(0,0);
+}
+function quickNew(k){
+  hideAllPops();
+  if(k==='tour')openTour(null,{date:todayStr()});
+  else if(k==='personal')openEventForm(null,{category:'personal',sub:'Hẹn cá nhân',date:todayStr()});
+  else openEventForm(null,{date:todayStr()});
+}
+
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+document.querySelectorAll('#v-schedule [data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;renderCurrent();});
+$('#prevB').onclick=()=>nav(-1);
+$('#nextB').onclick=()=>nav(1);
+$('#todayB').onclick=()=>{cur=todayStr();renderCurrent();};
+$('#addEv').onclick=()=>openEventForm(null,{date:cur});
+$('#expEv').onclick=exportSchedule;
+$('#newTour').onclick=()=>openTour(null,{date:todayStr()});
+$('#newPersonal').onclick=()=>openEventForm(null,{category:'personal',sub:'Hẹn cá nhân',date:todayStr()});
+$('#expInc').onclick=exportIncome;
+$('#bell').onclick=e=>{e.stopPropagation();togglePop('#notif');};
+$('#quick').onclick=e=>{e.stopPropagation();togglePop('#qmenu');};
+document.querySelectorAll('#qmenu [data-q]').forEach(b=>b.onclick=()=>quickNew(b.dataset.q));
+document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bell,#quick'))hideAllPops();});
+
+syncAll();
+save();
+show('dashboard');
+setInterval(checkReminders,30000);
+checkReminders();
+
+// Cài làm ứng dụng trên điện thoại + chạy được khi mất mạng
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW lỗi',e));});
+}
+</script>
+</body>
+</html>
